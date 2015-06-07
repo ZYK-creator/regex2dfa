@@ -18,7 +18,7 @@ void handle_request(fcgi::request r) {
     std::string mode  = query["mode"];
     std::string format = query["format"];
     regex_tree tree(regex);
-    auto d = tree.construct_dfa();
+    auto d = tree.construct_dfa().minimize();
     
     //draw either a tree or a DFA as text or png 
     //depending on the query string        

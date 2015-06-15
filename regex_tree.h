@@ -71,7 +71,7 @@ struct dfa {
 			for(const auto &p : transitions[a]) {
 				if(!visited.count(p.second)) {
 					q.push_back(p.second);
-                    visited.insert(p.second);
+					visited.insert(p.second);
 				}
 				ss << "\t" << a << " -> " << p.second
 				   << " [label=\"" << p.first << "\"];\n";
@@ -81,8 +81,7 @@ struct dfa {
 		return ss.str();
 	}
 
-	int &distinct(int s1, int s2, 
-					 std::vector<std::vector<int>> &table) const
+	int &distinct(int s1, int s2, std::vector<std::vector<int>> &table) const
 	{
 		return table[std::max(s1,s2)][std::min(s1,s2)];
 	}
@@ -91,8 +90,9 @@ struct dfa {
 		bool updated = false;
 		if(distinct(s1,s2,table))
 			return false;
-		const auto &m1 = transitions[s1];
-		const auto &m2 = transitions[s2];		
+		std::map<char,int> empty;
+		const auto &m1 = ((s1 == size()) ? empty : transitions[s1]);
+		const auto &m2 = ((s2 == size()) ? empty : transitions[s2]);		
 		for(const auto &m : {m1,m2})
 		for(const auto &p : m) {
 			char c = p.first;
@@ -127,9 +127,9 @@ struct dfa {
 			
 			for(std::size_t p = 0; p <= size(); p++) {
 				for(std::size_t q = 0; q < p;      q++)	{
-					std::cout << distinct(p,q,table);
+					//std::cerr  << distinct(p,q,table);
 				}
-				std::cout << "\n";
+				//std::cerr << "\n";
 			}
 			
 			std::vector<int> grouped(size()+1);
@@ -147,16 +147,42 @@ struct dfa {
 				groups.insert(group);
 			}
 		}
+		const dfa &orig = *this;
+		dfa res;
+		std::vector<std::set<int>> groups_arr(groups.begin(), groups.end());
+		res.transitions.resize(groups_arr.size());
 		
-		for(auto g : groups) {
-			for(auto i : g) {
-				std::cout << i << " ";
-			}
-			std::cout << "\n";
+		auto find_group_index = [&](int state) -> std::size_t {
+		    for(int i = 0; i < groups_arr.size(); i++) {
+			if(groups_arr[i].count(state))
+			    return i;
+		    }
+		    throw std::runtime_error("no group found?");
+		};
+		//ensure that the group containing the start state is the first group
+		int start_group = find_group_index(0);
+		std::swap(groups_arr[start_group], groups_arr[0]);
+
+		//iterate over the original states
+		//inserting transitions between groups
+		for(int i = 0; i < orig.transitions.size(); i++) {
+		    //iterate over the original edges
+		    for(const std::pair<char, int> &p : orig.transitions[i]) {
+			//insert the proper transition into the new DFA (group->group)
+			res.transitions[find_group_index(i)][p.first] = find_group_index(p.second);
+		    }
 		}
 		
-		std::cout << groups.size() << "\n";
-		return *this;
+		//determine which groups are accepting
+		for(int i = 0; i < groups_arr.size(); i++) {
+		    bool is_accepting = false;
+		    for(int state : groups_arr[i])
+			is_accepting |= accepting(state);
+		    res.accepting_.push_back(is_accepting);
+		}
+		
+		//std::cerr << groups.size() << "\n";
+		return res;
 	}		
 };
 

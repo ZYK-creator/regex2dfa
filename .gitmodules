@@ -1,0 +1,3 @@
+[submodule "rapunzel"]
+	path = rapunzel
+	url = https://github.com/missblit/rapunzel.git

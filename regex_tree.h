@@ -153,11 +153,11 @@ struct dfa {
 		res.transitions.resize(groups_arr.size());
 		
 		auto find_group_index = [&](int state) -> std::size_t {
-		    for(int i = 0; i < groups_arr.size(); i++) {
-			if(groups_arr[i].count(state))
-			    return i;
-		    }
-		    throw std::runtime_error("no group found?");
+			for(int i = 0; i < groups_arr.size(); i++) {
+				if(groups_arr[i].count(state))
+					return i;
+			}
+			throw std::runtime_error("no group found?");
 		};
 		//ensure that the group containing the start state is the first group
 		int start_group = find_group_index(0);
@@ -342,7 +342,7 @@ public:
 		root = start();
 		auto end_marker = std::make_unique<terminator_node>(current_id++);
 		root = std::make_unique<cat_node>(std::move(root),
-										  std::move(end_marker));
+		std::move(end_marker));
 		root->build_followpos();
 	}
 	
@@ -369,7 +369,7 @@ public:
 		std::unique_ptr<node> right;
 		while((right = term())) {
 			left = std::make_unique<cat_node>(std::move(left),
-										      std::move(right));
+			std::move(right));
 		}
 		return left;
 	}

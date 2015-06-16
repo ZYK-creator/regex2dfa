@@ -54,18 +54,18 @@ public:
 	/* Reads all output */
 	std::string read_all();
     
-    /* Reads pending output */
-    std::string read_some();
+	/* Reads pending output */
+	std::string read_some();
     
-    /* Reads with current blocking mode*/
-    std::string read();
+	/* Reads with current blocking mode*/
+	std::string read();
     
-    /* set read() to be non-blocking */
-    void set_nonblocking();
-    /* set read() to be blocking */
-    void set_blocking();
+	/* set read() to be non-blocking */
+	void set_nonblocking();
+	/* set read() to be blocking */
+	void set_blocking();
 
-    void wait();
+	void wait();
 private:
 	int pid;
 	Pipe in;  //Write end of pipe

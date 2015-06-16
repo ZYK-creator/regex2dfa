@@ -56,13 +56,13 @@ Process::Process(const std::string &command) : Process(command, {})
 Process::Process(const std::string &command,
                  const std::vector<std::string> &args)
 {
-    //convert the arguments into an exec friendly form
-    std::vector<const char *> c_args;
-    c_args.reserve(args.size()+2);
-    c_args.push_back(command.c_str());
-    for(const std::string &s : args) 
-        c_args.push_back(s.c_str());
-    c_args.push_back(nullptr);
+	//convert the arguments into an exec friendly form
+	std::vector<const char *> c_args;
+	c_args.reserve(args.size()+2);
+	c_args.push_back(command.c_str());
+	for(const std::string &s : args) 
+		c_args.push_back(s.c_str());
+	c_args.push_back(nullptr);
 
 	pid = fork();
 	if(pid == -1)
@@ -73,16 +73,16 @@ Process::Process(const std::string &command,
 		in.close(1); //input  write
 		out.close(0); //output read
 		/* set up std io for pipes */
-        dup2(in[0],  STDIN_FILENO ); //set stdin  to read  channel of in
+		dup2(in[0],  STDIN_FILENO ); //set stdin  to read  channel of in
 		dup2(out[1], STDOUT_FILENO); //set stdout to write channel of out
 		dup2(out[1], STDERR_FILENO); //set stderr to write channel of out
 
 		/* execute program */
 		int res = execvp(command.c_str(),
-                         const_cast<char * const *>(c_args.data()));
+		                 const_cast<char * const *>(c_args.data()));
         throw std::runtime_error(std::string("execv returned ")
-                                 + std::to_string(res) + ": "
-                                 + strerror(errno));
+	                         + std::to_string(res) + ": "
+	                         + strerror(errno));
 	}
 	else {
 		/* Parent process */
@@ -93,33 +93,33 @@ Process::Process(const std::string &command,
 }
 
 void Process::set_nonblocking() {
-    int flags;
-    flags = fcntl(out[0], F_GETFL, 0);
-    if(flags == -1)
-        throw std::runtime_error("fcntl returned -1");
-    flags = fcntl(out[0], F_SETFL, flags | O_NONBLOCK);
-    if(flags == -1) 
-        throw std::runtime_error("fcntl returned -1");
+	int flags;
+	flags = fcntl(out[0], F_GETFL, 0);
+	if(flags == -1)
+		throw std::runtime_error("fcntl returned -1");
+	flags = fcntl(out[0], F_SETFL, flags | O_NONBLOCK);
+	if(flags == -1) 
+		throw std::runtime_error("fcntl returned -1");
 }
 
 void Process::set_blocking() {
-    int flags;
-    flags = fcntl(out[0], F_GETFL, 0);
-    if(flags == -1) {
-        throw std::runtime_error("fcntl returned -1");
-    }
-    flags = fcntl(out[0], F_SETFL, flags & ~O_NONBLOCK);     
-    if(flags == -1) 
-        throw std::runtime_error("fcntl returned -1");
+	int flags;
+	flags = fcntl(out[0], F_GETFL, 0);
+	if(flags == -1) {
+		throw std::runtime_error("fcntl returned -1");
+	}
+	flags = fcntl(out[0], F_SETFL, flags & ~O_NONBLOCK);     
+	if(flags == -1) 
+		throw std::runtime_error("fcntl returned -1");
 }
 
 /* TODO: properly destruct process */
 Process::~Process() {
-    in.close();
-    out.close();
+	in.close();
+	out.close();
 	if(running()) {
 		//kill(pid, SIGTERM);
-        wait();
+	wait();
 		//throw std::runtime_error("Process - messy child shutdown");
 	}
 }
@@ -139,31 +139,31 @@ bool Process::running() {
 	
 /* TODO: handle blocking or incomplete writes */
 void Process::write(std::string input) {
-    set_blocking();
-    auto remaining = input.size();
-    while(remaining) {
-        auto count = ::write(in[1], input.c_str(), input.size());
-        if(count == -1) {
-            throw std::runtime_error("Write returned -1 :(");
-        }
-        else {
-            remaining -= count;
-        }
-    }
+	set_blocking();
+	auto remaining = input.size();
+	while(remaining) {
+		auto count = ::write(in[1], input.c_str(), input.size());
+		if(count == -1) {
+			throw std::runtime_error("Write returned -1 :(");
+		}
+		else {
+			remaining -= count;
+		}
+	}
 }
 
 std::string Process::read_some() {
-    set_nonblocking();
-    return read();
+	set_nonblocking();
+	return read();
 }
 
 std::string Process::read_all() {
-    set_blocking();
-    return read();
+	set_blocking();
+	return read();
 }
 
 std::string Process::read() {
-    std::string res;
+	std::string res;
 	const int block_size = 1024;
 	std::vector<char> buff(block_size);
 	while(true) {
@@ -175,13 +175,13 @@ std::string Process::read() {
 			if(errno == EAGAIN || errno == EWOULDBLOCK)
 				break;
 			else
-                throw std::runtime_error("read returned something unexpected");
+				throw std::runtime_error("read returned something unexpected");
 		}
 		else {
-            res.insert(std::end(res), std::begin(buff),
-                                      std::begin(buff) + count);
+			res.insert(std::end(res), std::begin(buff),
+			           std::begin(buff) + count);
 			continue;
-        }
+		}
 	}
 	return res;
 }
@@ -191,6 +191,6 @@ void Process::close_input() {
 }
 
 void Process::wait() {
-    int res;
-    waitpid(pid, &res, 0);
+	int res;
+	waitpid(pid, &res, 0);
 }

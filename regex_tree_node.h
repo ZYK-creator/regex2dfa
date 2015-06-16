@@ -63,7 +63,7 @@ public:
 		return {this};
 	}
 	std::string to_string() const {
-		return std::string() + letter_ + ":"	 + std::to_string(id_);
+		return std::string() + letter_ + ":"  + std::to_string(id_);
 	}
 	
 	int num_children() const { return 0; }

@@ -1,0 +1,45 @@
+<!doctype html>
+<meta charset="UTF-8"> 
+<h1>Regex2DFA</h1>
+<p>This is just a little code from my (unfinished) lexer project to 
+   convert regular expressions to minimized DFAs</p>
+<p>There's still a lot un-done, but for now you can try inputting any regex with the following:
+<ul>
+<li><pre>|  - or</pre>
+<li><pre>*  - any number</pre>
+<li><pre>() - parens</pre>
+<li><pre>Any ASCII letter - character</pre>
+</ul>
+The regex grammar is more or less
+<pre>
+	start -> regex EOF
+	regex -> expr {'|' expr}
+	expr  ->   term {term} 
+	term  ->   letter {'*'}
+	         | '(' regex ')' {'*'}
+</pre>
+Notes:
+<ul>
+<li>The dead state is not shown,
+    just assume that any missing edge goes to the dead state
+<li>Any "too large" graph will silently fail to render to keep from stressing out my server (graphviz is slow!).
+<li>Javascript is required. If you don't have javascript view the image directly and change it's URL yourself.
+</ul>
+This is a work in progress and there could be bugs. Feel free to email me any comments at zoeacacia ＠ gmail ᛫ com 
+</p>
+<script type="text/javascript">
+function handle_form(form) {
+    var img = document.getElementById('output_img');
+    regex = encodeURIComponent(form.regex.value);
+    mode = form.mode.value;
+    img.setAttribute('src','http://mblit.us/regex_demo.fcgi?mode='+mode+'&regex='+regex);
+    return false;
+}
+</script>
+<form onsubmit="return handle_form(this);">
+<input type="text" name="regex" value="(a|b)*abb"> <br>
+<input type="radio" name="mode" value="tree">Tree
+<input type="radio" name="mode" value="dfa" checked>DFA
+<br>
+<input type="submit" value="Submit"> <br>
+<img id="output_img" style="max-width:100%" src="http://mblit.us/regex_demo.fcgi?mode=dfa&regex=(a|b)*abb"></img>

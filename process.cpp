@@ -80,7 +80,7 @@ Process::Process(const std::string &command,
 		/* execute program */
 		int res = execvp(command.c_str(),
 		                 const_cast<char * const *>(c_args.data()));
-        throw std::runtime_error(std::string("execv returned ")
+        	throw std::runtime_error(std::string("execv returned ")
 	                         + std::to_string(res) + ": "
 	                         + strerror(errno));
 	}
@@ -119,7 +119,7 @@ Process::~Process() {
 	out.close();
 	if(running()) {
 		//kill(pid, SIGTERM);
-	wait();
+		wait();
 		//throw std::runtime_error("Process - messy child shutdown");
 	}
 }
@@ -170,7 +170,7 @@ std::string Process::read() {
 		auto count = ::read(out[0], buff.data(), block_size);
 		if(count == 0) {
 			break;
-        }
+        	}
 		else if(count == -1) {
 			if(errno == EAGAIN || errno == EWOULDBLOCK)
 				break;

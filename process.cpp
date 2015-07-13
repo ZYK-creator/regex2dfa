@@ -28,7 +28,7 @@ void Pipe::close(int i) {
 		throw std::out_of_range(  std::string("Pipe index ") + std::to_string(i)
 		                        + " is out of range");
 	if(open[i]) {
-        open[i] = false;
+        	open[i] = false;
 		int res = ::close(fd[i]);
 		if(res == -1)
 			throw std::runtime_error("close() returned -1");
